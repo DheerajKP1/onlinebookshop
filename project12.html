@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta http-equiv="X-UA-Compatible" content="ie=edge">
+ <title>javascript</title>
+</head>
+<style>
+    BODY { 
+background: #AAAAAA;
+}
+
+.tile1, .tile2, .tile3, .tile4, .tile5, .tile6, .tile7, .tile8, .tile9 ,.tile10,.tile11,.tile12,.tile13,.tile14,.tile15{
+  display: table-cell;
+  width: 120px;
+  height: 120px;
+  border: 1px solid white;
+  
+ background-color: blue;
+  cursor: pointer;
+}
+.tile16{
+  display: table-cell;
+  width: 120px;
+  height: 120px;
+  border: 1px solid white;
+background-color: white;
+}
+
+/*.tile1 {background-position: left top;}
+.tile2 {background-position: center top;}
+.tile3 {background-position: right top;}
+.tile4 {background-position: left center;}
+.tile5 {background-position: center center;}
+.tile6 {background-position: right center;}
+.tile7 {background-position: left bottom;}
+.tile8 {background-position: center bottom;}
+.tile9 {background: white; cursor: default;}*/
+</style>
+<body>
+    <center>
+        <div id="table" style="display: table;">
+        <div id="row1" style="display: table-row;">
+           <div id="cell11" class="tile1" onClick="clickTile(1,1);"> 
+            <div class="number">1</div>
+           </div>
+           <div id="cell12" class="tile2" onClick="clickTile(1,2);">
+            <div class="number">2</div> </div>
+           <div id="cell13" class="tile3" onClick="clickTile(1,3);"> 
+            <div class="number">3</div>
+           </div>
+           <div id="cell14" class="tile4" onClick="clickTile(1,4);">
+            <div class="number">4</div> </div>
+        </div>
+        <div id="row2" style="display: table-row;">
+           <div id="cell21" class="tile5" onClick="clickTile(2,1);"> 
+            <div class="number">5</div>
+           </div>
+           <div id="cell22" class="tile6" onClick="clickTile(2,2);"> 
+            <div class="number">6</div>
+           </div>
+           <div id="cell23" class="tile7" onClick="clickTile(2,3);"> 
+            <div class="number">7</div>
+           </div>
+           <div id="cell24" class="tile8" onClick="clickTile(2,4);"> 
+            <div class="number">8</div>
+           </div>
+        </div>
+        <div id="row3" style="display: table-row;">
+           <div id="cell31" class="tile9" onClick="clickTile(3,1);">9</div>
+           <div id="cell32" class="tile10" onClick="clickTile(3,2);">10</div>
+           <div id="cell33" class="tile11" onClick="clickTile(3,3);">11</div>
+           <div id="cell34" class="tile12" onClick="clickTile(3,4);">12</div>
+        </div>
+        <div id="row4" style="display: table-row;">
+            <div id="cell41" class="tile13" onClick="clickTile(4,1);">13</div>
+            <div id="cell42" class="tile14" onClick="clickTile(4,2);">14</div>
+            <div id="cell43" class="tile15" onClick="clickTile(4,3);">15</div>
+            <div id="cell44" class="tile16" onClick="clickTile(4,4);"></div>
+         </div>
+     </div>
+       <button onClick="shuffle();">New Game</button>
+     </center>
+     <script>
+        var noCols = 3;
+var noRows = 3;
+
+var boardX = 10;
+var boardY = 10;
+var squareSize = 175;
+
+var board = [];
+var noMoves = 0;
+
+
+function enter()
+{
+    background('Leaves');
+    generateBoard();
+
+    noMoves = 0;
+}
+
+function loop()
+{
+    clear();
+    
+    drawBoard();
+    displayStats();
+}
+
+function mouseClicked()
+{
+    switchTiles();
+    
+    if (checkWin())
+    {
+        showScene("Win", noMoves);
+    }
+}
+
+// debugging method...
+function keyPressed()
+{
+    if (key.toUpperCase() === "X")
+    {
+        board = [1, 2, 3, 4, 5, 6, 7, 0, 8];
+    }
+}
+
+function generateBoard()
+{
+    board = [];
+    
+    var n = noRows * noCols;
+    for(var i = 0; i < n; i++)
+    {
+        board.push(i);
+    }
+    
+    shuffleArray(board);
+}
+
+
+function drawBoard()
+{
+    for(var row = 0; row < noRows; row++)
+    {
+        for(var col = 0; col < noCols; col++)
+        {
+            var value = getTileValue(row, col);
+            
+            var x = boardX + col * squareSize;
+            var y = boardY + row * squareSize;
+
+            drawTile(x, y, value);
+        }
+    }
+}
+
+function drawTile(x, y, value)
+{
+    fill( value != 0 ? "tan" : "white" );
+    stroke("black");
+    strokeWeight(1);
+    
+    rect(x, y, squareSize, squareSize);
+    
+    if (value != 0)
+    {
+        push();
+        textAlign(CENTER);
+        textSize(24);
+        noStroke();
+        fill("black");
+        text(value, x + squareSize / 2, y + squareSize / 2);
+        pop();
+    }
+}
+
+function getTileValue(row, col)
+{
+    var index = row * noCols + col;
+    return board[index];
+}
+
+function setTileValue(row, col, value)
+{
+    var index = row * noCols + col;
+    board[index] = value;
+}
+
+function findClickedTile(x, y)
+{
+    var col = Math.floor( (x - boardX) / squareSize );
+    var row = Math.floor( (y - boardY) / squareSize );
+    
+    if (col < 0 || col >= noCols || row < 0 || row >= noRows )
+    {
+        return null;
+    }
+    
+    return { row : row, col : col }
+}
+
+function findEmptyTile(row, col)
+{
+    // check left tile if exists
+    if (col > 0)
+    {
+        if (getTileValue(row, col - 1) == 0)
+            return { row : row, col : col - 1 };
+    }
+    
+    // check right tile if exists
+    if (col < noCols - 1)
+    {
+        if (getTileValue(row, col + 1) == 0)
+            return { row : row, col : col + 1 };
+        
+    }
+    
+    // check up tile
+    if (row > 0)
+    {
+        if (getTileValue(row - 1, col) == 0)
+            return { row : row - 1, col : col };
+    }
+    
+    // check down tile
+    if (row < noRows - 1)
+    {
+        if (getTileValue(row + 1, col) == 0)
+            return { row : row + 1, col : col };
+    }
+
+    return null;
+}
+
+function switchTiles()
+{
+    var tile = findClickedTile(mouseX, mouseY);
+    if (!tile)
+        return;
+    
+    var emptyTile = findEmptyTile(tile.row, tile.col);
+    if (!emptyTile)
+        return;
+        
+    var tileValue = getTileValue(tile.row, tile.col);
+    setTileValue(emptyTile.row, emptyTile.col, tileValue);
+    setTileValue(tile.row, tile.col, 0);
+    
+    noMoves++;
+}
+
+function checkWin()
+{
+    for(var i = 0; i < board.length - 1; i++)
+    {
+        if (board[i] != i + 1)
+            return false;
+    }
+    
+    return true;
+}
+
+function displayStats()
+{
+    fill(0);
+    noStroke();
+    text("Moves: " + noMoves, 10, height - 10);
+}
+
+function shuffleArray(ar)
+{
+    var n = ar.length;
+    for(var i = 0; i < n; i++)
+    {
+        var i2 = getRandomIntInclusive(0, n - 1);
+        var t = ar[i];
+        ar[i] = ar[i2];
+        ar[i2] = t;        
+    }
+}
+
+function getRandomIntInclusive(min, max) 
+{
+    min = Math.ceil(min);
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+     </script>
+</body>
+</html>
